@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+
+.circle1 {
+  position: fixed;
+  /* relative to viewport */
+  top: 7%;
+  left: 30%;
+  width: 13em;
+  height: 13em;
+  border-radius: 50%;
+  box-shadow: 0 0 50px #d84869;
+  background: linear-gradient(-25deg, #d84869, #f46641);
+  animation: circleAnimation 15s infinite;
+}
+
+@keyframes circleAnimation {
+  50% {
+    left: 33%;
+    top: 6%;
+    scale: 1.11;
+  }
+}
+
+.circle2 {
+  position: fixed;
+  /* relative to viewport */
+  bottom: 3%;
+  right: 18%;
+  width: 19em;
+  height: 19em;
+  border-radius: 50%;
+  box-shadow: 0 0 50px #5648d8;
+  background: linear-gradient(-25deg, #5648d8, #8641f4);
+  animation: circle2Animation 8s infinite;
+}
+
+@keyframes circle2Animation {
+  50% {
+    bottom: 4%;
+    right: 19%;
+  }
+}

@@ -1,0 +1,20 @@
+.playerContainer {
+  @apply flex flex-col justify-center items-center relative rounded-full;
+}
+
+.icon {
+  @apply text-white absolute left-2 top-4 flex justify-center items-center gap-1;
+}
+
+
+.notPlaying {
+  @apply flex items-center justify-center;
+}
+
+.img {
+  @apply object-contain rounded-3xl select-none
+}
+
+.name {
+  @apply text-white text-3xl font-light capitalize
+}
