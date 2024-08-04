@@ -33,7 +33,7 @@ export default function Home() {
         <div className={styles.homeContainer}>
           <h1>Voice Call App</h1>
           <div className={styles.enterRoom}>
-            <div className=" relative w-full text-center">
+            <div className=" relative w-full text-center flex justify-center items-start">
               <input
               required
                 className="text-black text-lg p-1 rounded w-9/12 mb-3"
@@ -42,7 +42,7 @@ export default function Home() {
                 onChange={(e) => setName(e?.target?.value)}
                 // defaultValue={'tester'}
               />
-              <Star color="black" size={16} className=" absolute -top-1 right-12 fill-red-500"/>
+              <Star color="black" size={16} className=" -mt-1 fill-red-500"/>
             </div>
             <span className=""> Enter RoomID</span>
             <input

@@ -1,5 +1,5 @@
 .homeContainer {
-  @apply w-4/12 mx-auto p-2   rounded-2xl mt-8 text-white flex flex-col items-center justify-evenly gap-3  border-2 border-[#06040430] bg-[#ffffff1a] backdrop-blur-sm;
+  @apply w-4/12 min-w-max mx-auto p-2   rounded-2xl mt-8 text-white flex flex-col items-center justify-evenly gap-3  border-2 border-[#06040430] bg-[#ffffff1a] backdrop-blur-sm;
 
   h1 {
     @apply text-2xl font-semibold text-center mt-4 select-none;
