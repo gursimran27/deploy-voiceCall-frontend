@@ -13,18 +13,18 @@ const usePlayer = (myId, roomId, peer,stream) => {
     delete playersCopy[myId]
 
     const nonHighlightedPlayers = playersCopy
-    console.log(nonHighlightedPlayers)
+    // console.log(nonHighlightedPlayers)
 
     const leaveRoom = () => {
         socket.emit('user-leave', myId, roomId)
-        console.log("leaving room", roomId)
+        // console.log("leaving room", roomId)
         peer?.disconnect();
-        stream.getTracks().forEach(track => track.stop());
+        stream?.getTracks().forEach(track => track.stop());
         router.push('/')
     }
 
     const toggleAudio = () => {
-        console.log("I toggled my audio")
+        // console.log("I toggled my audio")
         setPlayers((prev) => {
             const copy = cloneDeep(prev)
             copy[myId].muted = !copy[myId].muted

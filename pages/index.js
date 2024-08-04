@@ -40,6 +40,7 @@ export default function Home() {
                 placeholder="Enter Your Name"
                 value={name}
                 onChange={(e) => setName(e?.target?.value)}
+                // defaultValue={'tester'}
               />
               <Star color="black" size={16} className=" absolute -top-1 right-12 fill-red-500"/>
             </div>

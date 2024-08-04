@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cloneDeep } from "lodash";
 
 import { useSocket } from "@/context/socket";
@@ -16,7 +16,7 @@ import { UserSquare2 } from "lucide-react";
 
 const Room = () => {
   const socket = useSocket();
-  const router = useRouter()
+  const router = useRouter();
   const { name, roomId } = useRouter().query;
   const { peer, myId } = usePeer(name);
   const { stream } = useMediaStream();
@@ -27,20 +27,37 @@ const Room = () => {
     nonHighlightedPlayers,
     toggleAudio,
     leaveRoom,
-  } = usePlayer(myId, roomId, peer,stream);
+  } = usePlayer(myId, roomId, peer, stream);
 
   const [users, setUsers] = useState([]);
+
+  const playerRef = useRef(players);
+  const myIdRef = useRef(myId);
+
+  const ref = useRef(false);
+
+  useEffect(() => {
+    playerRef.current = players;
+    myIdRef.current = myId;
+  }, [players, myId]);
 
   // call the joined person and send strams also and also receive the streams from him/her
   useEffect(() => {
     if (!socket || !peer || !stream) return;
     const handleUserConnected = (newUser, remoteName) => {
-      console.log(`user connected in room with userId ${newUser} and name ${remoteName}`);
+      // console.log(
+      //   `user connected in room with userId ${newUser} and name ${remoteName}`
+      // );
 
-      const call = peer.call(newUser, stream, { metadata: { name: name } });
+      const call = peer.call(newUser, stream, {
+        metadata: {
+          name: name,
+          muted: playerRef.current[myIdRef.current].muted,
+        },
+      });
 
       call.on("stream", (incomingStream) => {
-        console.log(`incoming stream from ${newUser}`);
+        // console.log(`incoming stream from ${newUser}`);
         setPlayers((prev) => ({
           ...prev,
           [newUser]: {
@@ -54,6 +71,7 @@ const Room = () => {
           ...prev,
           [newUser]: call,
         }));
+        ref.current = true;
       });
     };
     socket.on("user-connected", handleUserConnected);
@@ -66,7 +84,7 @@ const Room = () => {
   useEffect(() => {
     if (!socket) return;
     const handleToggleAudio = (userId) => {
-      console.log(`user with id ${userId} toggled audio`);
+      // console.log(`user with id ${userId} toggled audio`);
       setPlayers((prev) => {
         const copy = cloneDeep(prev);
         copy[userId].muted = !copy[userId].muted;
@@ -75,7 +93,7 @@ const Room = () => {
     };
 
     const handleUserLeave = (userId) => {
-      console.log(`user ${userId} is leaving the room`);
+      // console.log(`user ${userId} is leaving the room`);
       users[userId]?.close(); //as users contain the call obj
       const playersCopy = cloneDeep(players);
       delete playersCopy[userId];
@@ -99,15 +117,15 @@ const Room = () => {
       const { peer: callerId } = call;
       call.answer(stream); //send streams also
       const rName = call.metadata.name;
+      const muted = call.metadata.muted;
 
       call.on("stream", (incomingStream) => {
-        console.log(`incoming stream from ${callerId}`);
+        // console.log(`incoming stream from ${callerId}`);
         setPlayers((prev) => ({
           ...prev,
           [callerId]: {
             url: incomingStream,
-            muted: true,
-            playing: true,
+            muted: muted,
             name: rName,
           },
         }));
@@ -116,6 +134,7 @@ const Room = () => {
           ...prev,
           [callerId]: call,
         }));
+        ref.current = true;
       });
     });
   }, [peer, setPlayers, stream]);
@@ -123,7 +142,7 @@ const Room = () => {
   // opening streams of current user
   useEffect(() => {
     if (!stream || !myId) return;
-    console.log(`setting my stream ${myId}`);
+    // console.log(`setting my stream ${myId}`);
     setPlayers((prev) => ({
       ...prev,
       [myId]: {
@@ -156,7 +175,7 @@ const Room = () => {
               Connecting...
             </div>
             <div className={styles.activePlayerContainer}>
-            <UserSquare2 className={styles.user} size={400} />
+              <UserSquare2 className={styles.user} size={400} />
             </div>
           </>
         )}
@@ -164,9 +183,10 @@ const Room = () => {
       <CopySection roomId={roomId} />
       <Bottom
         muted={playerHighlighted?.muted}
-        playing={playerHighlighted?.playing}
         toggleAudio={toggleAudio}
         leaveRoom={leaveRoom}
+        clickable={ref.current}
+        players={players}
       />
     </>
   );
