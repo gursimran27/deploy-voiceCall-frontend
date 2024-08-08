@@ -1,0 +1,40 @@
+.toolboxContainer {
+    @apply p-5 absolute top-1/4 left-5 w-64 rounded-md border-2 border-[#ffffff5d] bg-[#ffffff1a] backdrop-blur-sm;
+    /* box-shadow: theme('colors.shadow1');
+    border: 1px solid theme('colors.border1');
+    background-color: theme('colors.background1'); */
+    box-shadow: 0 0 50px #d8486a;
+    background: linear-gradient(-25deg, #d8486a2f, #f4654188);
+
+    .toolItem {
+        @apply mb-5;
+
+        .toolText {
+            @apply select-none;
+            font-size: 11px;
+            color: white;
+        }
+
+        .itemContainer {
+            @apply flex justify-between mt-2;
+
+            .colorBox {
+                @apply h-5 w-5 mr-1 rounded-sm;
+                cursor: url("/paintbucket.png"), auto;
+                &:hover, &.active {
+                    @apply transition-all duration-300;
+                    border: 1.8px solid black ;
+                    box-shadow: 0 0 0 1px #4a47b1;
+                    scale: 1.5;
+                }
+            }
+        }
+    }
+
+    @media screen and (max-width: 640px) {
+        top: unset;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+    }
+}

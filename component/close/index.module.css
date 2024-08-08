@@ -1,0 +1,9 @@
+/* styles.css or module.css */
+
+.top {
+    @apply rounded-full bg-red-500 px-2 py-1 hover:bg-white transition-all duration-300 cursor-pointer;
+}
+
+.top:hover .lower {
+    @apply text-red-500 transition-all duration-300;
+}

@@ -13,13 +13,21 @@ import CopySection from "@/component/CopySection";
 import styles from "@/styles/room.module.css";
 import { useRouter } from "next/router";
 import { UserSquare2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleOpenpaint } from "@/slice/menuSlice";
+import Menu from "@/component/Menu";
+import Toolbox from "@/component/Toolbox";
+import Board from "@/component/Board";
+import Close from "@/component/close";
 
 const Room = () => {
+  const { openPaint } = useSelector((state) => state.menu);
   const socket = useSocket();
   const router = useRouter();
   const { name, roomId } = useRouter().query;
   const { peer, myId } = usePeer(name);
   const { stream } = useMediaStream();
+  const dispatch = useDispatch();
   const {
     players,
     setPlayers,
@@ -33,13 +41,16 @@ const Room = () => {
 
   const playerRef = useRef(players);
   const myIdRef = useRef(myId);
+  const openPaintref = useRef(openPaint);
 
   const ref = useRef(false);
+  const ref2 = useRef(false);
 
   useEffect(() => {
     playerRef.current = players;
     myIdRef.current = myId;
-  }, [players, myId]);
+    openPaintref.current = openPaint;
+  }, [players, myId, openPaint]);
 
   // call the joined person and send strams also and also receive the streams from him/her
   useEffect(() => {
@@ -53,6 +64,7 @@ const Room = () => {
         metadata: {
           name: name,
           muted: playerRef.current[myIdRef.current].muted,
+          isOpened: openPaintref.current,
         },
       });
 
@@ -115,9 +127,13 @@ const Room = () => {
     if (!peer || !stream) return;
     peer.on("call", (call) => {
       const { peer: callerId } = call;
-      call.answer(stream); //send streams also
       const rName = call.metadata.name;
       const muted = call.metadata.muted;
+      const isOpened = call.metadata.isOpened;
+
+      dispatch(toggleOpenpaint({ open: isOpened }));
+
+      call.answer(stream); //send streams also
 
       call.on("stream", (incomingStream) => {
         // console.log(`incoming stream from ${callerId}`);
@@ -137,12 +153,13 @@ const Room = () => {
         ref.current = true;
       });
     });
-  }, [peer, setPlayers, stream]);
+  }, [peer, setPlayers, stream, dispatch]);
 
   // opening streams of current user
   useEffect(() => {
-    if (!stream || !myId) return;
+    if (!stream || !myId || ref2.current) return;
     // console.log(`setting my stream ${myId}`);
+    ref2.current = true;
     setPlayers((prev) => ({
       ...prev,
       [myId]: {
@@ -153,41 +170,84 @@ const Room = () => {
     }));
   }, [myId, setPlayers, stream]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleTooglePaint = (isOpened) => {
+      dispatch(toggleOpenpaint({ open: isOpened }));
+    };
+
+    socket.on("handleTooglePaint", handleTooglePaint);
+
+    return () => {
+      socket.off("handleTooglePaint", handleTooglePaint);
+    };
+  }, [socket, dispatch]);
+
   return (
     <>
-      <div className={styles.activePlayerContainer}>
-        {Object.keys(nonHighlightedPlayers).length != 0 ? (
-          Object.keys(nonHighlightedPlayers).map((playerId) => {
+      {!openPaint ? (
+        <>
+          <div className={styles.activePlayerContainer}>
+            {Object.keys(nonHighlightedPlayers).length != 0 ? (
+              Object.keys(nonHighlightedPlayers).map((playerId) => {
+                const { url, muted, name } = nonHighlightedPlayers[playerId];
+                return (
+                  <Player
+                    key={playerId}
+                    url={url}
+                    muted={muted}
+                    isActive={true}
+                    name={name}
+                  />
+                );
+              })
+            ) : (
+              <>
+                <div className=" text-center mx-auto my-auto text-4xl mt-10 font-light text-blue-300 animate-pulse">
+                  Connecting...
+                </div>
+                <div className={styles.activePlayerContainer}>
+                  <UserSquare2 className={styles.user} size={400} />
+                </div>
+              </>
+            )}
+          </div>
+          <CopySection roomId={roomId} />
+          <Bottom
+            muted={playerHighlighted?.muted}
+            toggleAudio={toggleAudio}
+            leaveRoom={leaveRoom}
+            clickable={ref.current}
+            players={players}
+          />
+        </>
+      ) : (
+        <div className=" w-[100vw] h-[100vh] z-10">
+          {Object.keys(nonHighlightedPlayers).map((playerId) => {
             const { url, muted, name } = nonHighlightedPlayers[playerId];
             return (
-              <Player
+              <audio
                 key={playerId}
-                url={url}
+                src={url}
+                autoPlay
                 muted={muted}
-                isActive={true}
-                name={name}
+                controls={false}
               />
             );
-          })
-        ) : (
-          <>
-            <div className=" text-center mx-auto my-auto text-4xl mt-10 font-light text-blue-300 animate-pulse">
-              Connecting...
-            </div>
-            <div className={styles.activePlayerContainer}>
-              <UserSquare2 className={styles.user} size={400} />
-            </div>
-          </>
-        )}
-      </div>
-      <CopySection roomId={roomId} />
-      <Bottom
-        muted={playerHighlighted?.muted}
-        toggleAudio={toggleAudio}
-        leaveRoom={leaveRoom}
-        clickable={ref.current}
-        players={players}
-      />
+          })}
+
+          <Menu />
+          <Toolbox />
+          <Board />
+          <div className=" absolute top-5 right-2 lg:right-5">
+            <Close />
+          </div>
+          <div>
+            <CopySection roomId={roomId} />
+          </div>
+        </div>
+      )}
     </>
   );
 };

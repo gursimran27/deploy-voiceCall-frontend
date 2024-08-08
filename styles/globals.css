@@ -67,3 +67,16 @@ body {
     right: 19%;
   }
 }
+
+.canvasWithPenCursor {
+  cursor: url("/pencil.png"), auto;
+}
+
+.canvasWithEraserCursor {
+  cursor: url("/eraser.png"), auto;
+}
+
+.paintbucket {
+  cursor: url("/paintbucket.png"), auto;
+}
+
