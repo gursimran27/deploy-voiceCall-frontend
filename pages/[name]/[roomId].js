@@ -19,6 +19,7 @@ import Menu from "@/component/Menu";
 import Toolbox from "@/component/Toolbox";
 import Board from "@/component/Board";
 import Close from "@/component/close";
+import AudioPlayerForCanvas from "@/component/CanvasAudioPlayer/AudioPlayerForCanvas";
 
 const Room = () => {
   const { openPaint } = useSelector((state) => state.menu);
@@ -226,14 +227,9 @@ const Room = () => {
         <div className=" w-[100vw] h-[100vh] z-10">
           {Object.keys(nonHighlightedPlayers).map((playerId) => {
             const { url, muted, name } = nonHighlightedPlayers[playerId];
+            console.log(nonHighlightedPlayers);
             return (
-              <audio
-                key={playerId}
-                src={url}
-                autoPlay
-                muted={muted}
-                controls={false}
-              />
+              <AudioPlayerForCanvas key={playerId} url={url} muted={muted} />
             );
           })}
 
